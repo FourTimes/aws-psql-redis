@@ -19,15 +19,29 @@ resource "aws_instance" "tf" {
   vpc_security_group_ids            = [aws_security_group.tf[each.key].id]
   user_data                         = ""
 
-
-  root_block_device {
-    delete_on_termination = true
-    encrypted             = true
-    iops                  = 3000
-    throughput            = 125
-    volume_size           = 250
-    volume_type           = "gp3"
+ dynamic "root_block_device" {
+    for_each = lookup(each.value, "root_block_devices")
+    # for_each = [for s in lookup(each.value, "root_block_devices") : {}]
+    # for_each = [for s in each.value["root_block_devices"]: {}]
+    content {
+    	delete_on_termination = root_block_device.value.delete_on_termination
+    	encrypted             = root_block_device.value.encrypted 
+    	iops                  = root_block_device.value.iops 
+    	throughput            = root_block_device.value.throughput 
+    	volume_size           = root_block_device.value.volume_size
+    	volume_type           = root_block_device.value.volume_type 
+   }
+}  
+  dynamic "ebs_block_device" {
+    for_each = lookup(each.value, "ebs_block_devices")
+    content {
+     device_name = ebs_block_device.value.device_name
+      volume_size = ebs_block_device.value.volume_size
+      volume_type = ebs_block_device.value.volume_type
+      delete_on_termination = ebs_block_device.value.delete_on_termination 
+    }
   }
+
   tags   = merge(
     { 
       Name          = each.key

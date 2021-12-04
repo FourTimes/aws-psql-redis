@@ -14,5 +14,26 @@ instances = {
         instance_type               = "t2.micro"
         monitoring                  = false
         instance_mode               = "public"
+        root_block_devices          = [{
+          delete_on_termination = true
+    	  encrypted             = true
+    	  iops                  = 3000
+    	  throughput            = 125
+    	  volume_size           = 250
+    	  volume_type           = "gp3"
+	  }
+	]
+       ebs_block_devices = [{
+    	  device_name = "/dev/sdg"
+    	  volume_size = 5
+    	  volume_type = "gp2"
+    	 delete_on_termination = false
+  	},
+        {
+    	  device_name = "/dev/sdh"
+    	  volume_size = 5
+    	  volume_type = "gp2"
+    	  delete_on_termination = false
+        }]
     }
 }
